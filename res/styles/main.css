@@ -1,0 +1,101 @@
+:root.dark {
+    --clr-dark-a0: #000000;
+    --clr-light-a0: #ffffff;
+
+    --clr-primary-a0: #7db800;
+    --clr-primary-a10: #8dc034;
+    --clr-primary-a20: #9dc852;
+    --clr-primary-a30: #acd06c;
+    --clr-primary-a40: #bad884;
+    --clr-primary-a50: #c9e09d;
+
+    --clr-surface-a0: #121212;
+    --clr-surface-a10: #282828;
+    --clr-surface-a20: #3f3f3f;
+    --clr-surface-a30: #575757;
+    --clr-surface-a40: #717171;
+    --clr-surface-a50: #8b8b8b;
+
+    --clr-surface-tonal-a0: #1d2016;
+    --clr-surface-tonal-a10: #32352b;
+    --clr-surface-tonal-a20: #484b42;
+    --clr-surface-tonal-a30: #60625a;
+    --clr-surface-tonal-a40: #787a73;
+    --clr-surface-tonal-a50: #92938d;
+
+    --clr-surface-a0-frosted: #12121250;
+}
+
+:root {
+    --clr-dark-a0: #000000;
+    --clr-light-a0: #ffffff;
+
+    --clr-primary-a0: #7db800;
+    --clr-primary-a10: #7fb224;
+    --clr-primary-a20: #81ac36;
+    --clr-primary-a30: #82a544;
+    --clr-primary-a40: #839f50;
+    --clr-primary-a50: #83995a;
+
+    --clr-surface-a0: #f5fcf2;
+    --clr-surface-a10: #e7ede5;
+    --clr-surface-a20: #dadfd8;
+    --clr-surface-a30: #ccd1cb;
+    --clr-surface-a40: #bfc3be;
+    --clr-surface-a50: #b2b5b1;
+
+    --clr-surface-tonal-a0: #eaf5dd;
+    --clr-surface-tonal-a10: #dee7d2;
+    --clr-surface-tonal-a20: #d2dac8;
+    --clr-surface-tonal-a30: #c5ccbd;
+    --clr-surface-tonal-a40: #babfb3;
+    --clr-surface-tonal-a50: #aeb2a8;
+
+    --clr-surface-a0-frosted: #f5fcf250;
+
+    --blur: 6.86px;
+}
+
+/* https://freefrontend.com/css-frosted-glass/ for the frosted glass effect */
+
+body {
+    background-image: url("../img/background/default.png");
+    margin: 0;
+    padding: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.frosted {
+    backdrop-filter: blur(var(--blur));
+    background-blend-mode: plus-lighter;
+    mix-blend-mode: normal;
+    border: 1px solid var(--clr-surface-a30);
+    background-color: var(--clr-surface-a0-frosted);
+    box-shadow: -9px -3px 48px -12px rgba(0, 0, 0, 0.15), -1.5px -0.5px 12px -8px rgba(0, 0, 0, 0.15), inset 1.7025px 0.5675px 9.08px rgba(255, 255, 255, 0.1155), inset 0.9525px 0.3175px 4.54px rgba(255, 255, 255, 0.1155);
+}
+
+
+.main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.dock {
+    display: flex;
+    position: fixed;
+    width: calc(100% - 40px);
+    height: 70px;
+    bottom: 20px;
+    left: 20px;
+    border-radius: 25px;
+    justify-content: space-between;
+    align-items: center;
+}
