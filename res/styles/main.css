@@ -68,8 +68,8 @@ body {
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    background-size: 110%;
 }
+
 .frosted {
     backdrop-filter: blur(var(--blur));
     background-blend-mode: plus-lighter;
