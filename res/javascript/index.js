@@ -7,11 +7,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
-window.onload = () => {
-    auth.onAuthStateChanged(user => {
+
+auth.onAuthStateChanged(user => {
     if (!user) {
         window.location.href = "setup.html";
     }
-    });
-
-}
+});
