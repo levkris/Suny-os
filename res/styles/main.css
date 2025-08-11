@@ -149,7 +149,9 @@ body {
     background-color: var(--clr-surface-a0-lowfrost);
 }
 
-.main {
+.main,
+.homescreen,
+.lockscreen {
     display: flex;
     flex-direction: column;
     height: 100%;
