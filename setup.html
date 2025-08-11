@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Suny Setup</title>
+    <link rel="stylesheet" href="res/styles/main.css" />
+    <link rel="stylesheet" href="res/styles/setup.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="res/javascript/setup.js"></script>
+    <script src="res/javascript/main.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
+</head>
+<body>
+    <div class="main">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <p class="os-name">Suny OS</p>
+            </div>
+            <div class="top-bar-right">
+                <p class="time" id="time">13:46</p>
+            </div>
+        </div>
+        <div class="steps">
+            
+        </div>
+        <div class="setup" data-page="1" id="setup">
+            <div class="info">
+                <h1 class="title">Welcome to Suny OS</h1>
+                <p class="subtitle">
+                    We will guide you step-by-step to ensure a smooth and straightforward configuration.
+                </p>
+            </div>
+            <div class="buttons">
+                <button class="frosted button" onclick="page = 2; renderPage()">Get started</button>
+            </div>
+            <p class="status hidden"></p>
+        </div>
+
+        <div class="setup" data-page="2" id="setup">
+            <div class="info">
+                <h1 class="title">Sign in with Google</h1>
+                <p class="subtitle">
+                    To ensure a secure and personalized experience, we need to verify your identity.
+                </p>
+            </div>
+            <div class="buttons">
+                <button class="frosted button" onclick="page = 1; renderPage()">Back</button>
+                <button class="frosted button" onclick="loginWithGoogle()">Sign in with Google</button>
+            </div>
+            <p class="status hidden"></p>
+        </div>
+
+        <div class="setup" data-page="3" id="setup">
+            <div class="info" style="top: 15%;">
+                <h1 class="title">Confirm your identity</h1>
+                <p class="subtitle">
+                    Please double check if you are signed in with the correct Google account.
+                </p>
+            </div>
+            <div class="user-info frosted">
+                <img src="" alt="Profile Picture" id="profile-pic" />
+                <div class="user-details">
+                    <p id="user-name"></p>
+                    <p id="user-email"></p>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="frosted button" onclick="logoutAndGoPage2()">This is not me</button>
+                <button class="frosted button" onclick="page = 4; renderPage()">Continue</button>
+            </div>
+            <p class="status hidden"></p>
+        </div>
+
+        <div class="setup" data-page="4" id="setup">
+            <div class="info">
+                <h1 class="title">Name your device</h1>
+                <p class="subtitle">
+                    You can name your device to make it easier to identify in the future. You can always change this later.
+                </p>
+            </div>
+            <div class="input-container">
+                <label for="device-name" class="device-label">Device Name:</label>
+                <input type="text" id="device-name" class="input frosted" placeholder="My Device" value="My Device" maxlength="50" minlength="3"/>
+            </div>
+            <div class="buttons">
+                <button class="frosted button" onclick="page = 3; renderPage()">Back</button>
+                <button class="frosted button" onclick="page = 5; renderPage()">Continue</button>
+            </div>
+            <p class="status hidden"></p>
+        </div>
+
+        <div class="setup" data-page="5" id="setup">
+            <div class="info" style="top: 15%;">
+                <h1 class="title">Secure your device</h1>
+                <p class="subtitle">
+                    Add a 4 digit PIN to secure your device from unauthorized access.
+                </p>
+            </div>
+            <div class="pin-container">
+                <div class="pin-cells">
+                    <div class="pin-cell frosted" id="pin-cell-1"></div>
+                    <div class="pin-cell frosted" id="pin-cell-2"></div>
+                    <div class="pin-cell frosted" id="pin-cell-3"></div>
+                    <div class="pin-cell frosted" id="pin-cell-4"></div>
+                </div>
+                <div class="pin-columns">
+                    <div class="pin-column">
+                        <button class="pin-column-button frosted" id="pin-column-1" onclick="pinClicked(1)">1</button>
+                        <button class="pin-column-button frosted" id="pin-column-2" onclick="pinClicked(2)">2</button>
+                        <button class="pin-column-button frosted" id="pin-column-3" onclick="pinClicked(3)">3</button>
+                    </div>
+                    <div class="pin-column">
+                        <button class="pin-column-button frosted" id="pin-column-4" onclick="pinClicked(4)">4</button>
+                        <button class="pin-column-button frosted" id="pin-column-5" onclick="pinClicked(5)">5</button>
+                        <button class="pin-column-button frosted" id="pin-column-6" onclick="pinClicked(6)">6</button>
+                    </div>
+                    <div class="pin-column">
+                        <button class="pin-column-button frosted" id="pin-column-7" onclick="pinClicked(7)">7</button>
+                        <button class="pin-column-button frosted" id="pin-column-8" onclick="pinClicked(8)">8</button>
+                        <button class="pin-column-button frosted" id="pin-column-9" onclick="pinClicked(9)">9</button>
+                    </div>
+                    <div class="pin-column">
+                        <button class="pin-column-button frosted" id="pin-column-backspace" onclick="removeLastPinDigit()"><span class="material-symbols-rounded">backspace</span></button>
+                        <button class="pin-column-button frosted" id="pin-column-0" onclick="pinClicked(0)">0</button>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="frosted button" onclick="page = 4; renderPage()">Back</button>
+                <button class="frosted button" id="next-skip" onclick="page = 6; renderPage()">Skip</button>
+            </div>
+            <p class="status hidden"></p>
+        </div>
+
+        <div class="setup" data-page="6" id="setup">
+            <div class="info">
+                <h1 class="title">Finish setup</h1>
+                <p class="subtitle">
+                    You are all set, you can now start using Suny OS.
+                </p>
+            </div>
+            <div class="buttons">
+                <button class="frosted button" onclick="page = 5; renderPage()">Back</button>
+                <button class="frosted button" onclick="finishSetup()">Finish setup</button>
+            </div>
+            <p class="status hidden"></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,20 +1,9 @@
-if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-    document.body.addEventListener('click', () => {
-        DeviceOrientationEvent.requestPermission().then(response => {
-            if (response === 'granted') startGyro();
-        });
-    });
-} else {
-    startGyro();
-}
+setInterval(() => {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
 
-function startGyro() {
-    window.addEventListener('deviceorientation', (event) => {
-        const { beta, gamma } = event;
+    const time = `${hours}:${minutes}`;
 
-        const x = 50 + (gamma / 45) * 10;
-        const y = 50 + (beta / 45) * 10;
-
-        document.body.style.backgroundPosition = `${x}% ${y}%`;
-    });
-}
+    document.getElementById("time").textContent = time;
+}, 1000);
