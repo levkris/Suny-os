@@ -170,7 +170,7 @@ function logoutAndGoPage2() {
 
 function finishSetup() {
     addDevice();
-    window.location.href = "/index.html";
+    window.location.href = "index.html";
     localStorage.removeItem("page");
 }
 function pinClicked(digit) {
