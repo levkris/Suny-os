@@ -18,17 +18,3 @@ function startGyro() {
         document.body.style.backgroundPosition = `${x}% ${y}%`;
     });
 }
-
-if (window.matchMedia("(pointer:coarse)").matches) {
-    document.body.addEventListener('long-press', () => {
-        if (window.navigator.share) {
-            window.navigator.share({
-                title: 'Gyro Background',
-                url: window.location.href
-            });
-        } else if (window.navigator.standalone) {
-            window.alert('Add to home screen by clicking the "share" icon and then selecting "Add to Home Screen"');
-        }
-    });
-}
-
