@@ -34,16 +34,51 @@ window.onload = () => {
 };
 
 async function handleUser(user) {
-    document.getElementById("profile-pic").src = user.photoURL;
-    document.getElementById("user-name").textContent = user.displayName;
-    document.getElementById("user-email").textContent = user.email;
-    document.getElementById("device-name").value = user.displayName + "'s Suny OS Device";
-    const userRef = db.collection("users").doc(user.uid);
-    await userRef.set({
-        name: user.displayName,
-        email: user.email,
-        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
+  document.getElementById("profile-pic").src = user.photoURL;
+  document.getElementById("user-name").textContent = user.displayName;
+  document.getElementById("user-email").textContent = user.email;
+  document.getElementById("device-name").value = `${user.displayName}'s Suny OS Device`;
+
+  const userRef = db.collection("users").doc(user.uid);
+
+  await userRef.set({
+    name: user.displayName,
+    email: user.email,
+    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  const currentDevice = {
+    user_agent: navigator.userAgent,
+    screen_resolution: `${window.screen.width}x${window.screen.height}`,
+    viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+    color_depth: window.screen.colorDepth,
+  };
+
+  const docSnap = await userRef.get();
+  if (!docSnap.exists) {
+    return;
+  }
+
+  const userData = docSnap.data();
+  const devices = userData.devices || [];
+
+  const matchedDevice = devices.find(device =>
+    device.user_agent === currentDevice.user_agent &&
+    device.screen_resolution === currentDevice.screen_resolution &&
+    device.viewport_size === currentDevice.viewport_size &&
+    device.color_depth === currentDevice.color_depth
+  );
+
+  let deviceId = null;
+
+  if (matchedDevice) {
+    deviceId = matchedDevice.device_id;
+
+    localStorage.setItem("device_id", deviceId);
+    localStorage.removeItem("page");
+    
+    window.location.href = "./";
+  }
 }
 
 let pin = [];
@@ -84,6 +119,10 @@ async function addDevice() {
       hashedPin = await hashPIN(userPin);
     }
 
+    const random_device_id = Math.floor(Math.random() * 1000000000);
+
+    localStorage.setItem("device_id", random_device_id);
+
     const deviceData = {
       user_agent: navigator.userAgent,
       device_name: deviceName,
@@ -93,7 +132,8 @@ async function addDevice() {
       screen_resolution: `${window.screen.width}x${window.screen.height}`,
       viewport_size: `${window.innerWidth}x${window.innerHeight}`,
       color_depth: window.screen.colorDepth,
-      timezone_offset: new Date().getTimezoneOffset()
+      timezone_offset: new Date().getTimezoneOffset(),
+      device_id: random_device_id
     };
 
     await userRef.set({
