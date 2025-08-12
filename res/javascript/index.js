@@ -13,15 +13,23 @@ auth.onAuthStateChanged(user => {
     if (!user || !localStorage.getItem("device_id") || localStorage.getItem("device_id") === "null" || localStorage.getItem("device_id") === "undefined") {
         window.location.href = "setup.html";
     }
+    if(user) {
+        window.currentUserId = user.uid;
+    }
 });
 
 let entered_pin = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     let lockscreen = document.getElementById("lockscreen");
     let lockscreenContent = lockscreen.querySelector(".lockscreen-content");
     let lockscreenBottom = lockscreen.querySelector(".lockscreen-bottom");
     let lockscreenUnlockingContent = lockscreen.querySelector(".lockscreen-unlocking-content");
+
+    let lockscreenStateIcon = lockscreen.querySelector(".lockscreen-state-icon");
+
+    let homescreen = document.getElementById("homescreen");
+    lockscreenUnlockingContent.style.transform = `translateY(-${window.innerHeight}px)`;
 
     let startY = 0;
     let currentY = 0;
@@ -31,10 +39,21 @@ document.addEventListener("DOMContentLoaded", () => {
     let maxBlur = parseFloat(getComputedStyle(document.documentElement)
                      .getPropertyValue("--blur")) || 6.86;
 
+    let hasPin = await checkPinStatus();
+
+    if (!hasPin) {
+        lockscreenStateIcon.textContent = "lock_open";
+    }
+        
+
     function setTranslateY(value) {
-        lockscreenContent.style.transform = `translateY(${value}px)`;
-        lockscreenBottom.style.transform = `translateY(${value}px)`;
-        lockscreenUnlockingContent.style.transform = `translateY(${value}px)`;
+        if (hasPin) {
+            lockscreenContent.style.transform = `translateY(${value}px)`;
+            lockscreenBottom.style.transform = `translateY(${value}px)`;
+            lockscreenUnlockingContent.style.transform = `translateY(${value}px)`;
+        } else {
+            lockscreen.style.transform = `translateY(${value}px)`;
+        }
     }
 
     function resetUnlockingContentPosition() {
@@ -71,7 +90,13 @@ document.addEventListener("DOMContentLoaded", () => {
             lockscreenUnlockingContent.style.transform = `translateY(${unlockingContentY}px)`;
 
             lockscreen.style.backdropFilter = `blur(${blurValue}px)`;
-            lockscreen.style.backgroundColor = `rgba(0, 0, 0, ${0.2 * progress})`;
+            if (hasPin) {
+                lockscreen.style.backgroundColor = `rgba(0, 0, 0, ${0.2 * progress})`;
+            }
+
+            if (!hasPin) {
+                lockscreenUnlockingContent.style.display = "none";        
+            }
         } 
         else if (phoneState === "unlocking") {
             if (currentY < 0) currentY = 0;
@@ -94,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (phoneState === "locked") {
             if (Math.abs(currentY) > threshold) {
-                lockscreen.style.transition = "backdrop-filter 0.3s ease-out";
+                lockscreen.style.transition = "backdrop-filter 0.3s ease-out, transform 0.2s ease-out, opacity 0.2s ease-out";
                 lockscreenContent.style.transition = "transform 0.2s ease-out";
                 lockscreenBottom.style.transition = "transform 0.2s ease-out";
                 lockscreenUnlockingContent.style.transition = "transform 0.2s ease-out";
@@ -102,25 +127,42 @@ document.addEventListener("DOMContentLoaded", () => {
                 setTranslateY(-window.innerHeight);
                 lockscreen.style.backdropFilter = `blur(${maxBlur}px)`;
         
-                lockscreenUnlockingContent.style.transform = `translateY(0)`;
+                if (hasPin) {
+                    lockscreenUnlockingContent.style.transform = `translateY(0px)`;
+                } else {
+                    lockscreen.style.transform = `translateY(-${window.innerHeight}px)`;
+                }
 
                 phoneState = "unlocking";
+
+                if (!hasPin) {
+                    lockscreen.style.opacity = "0";
+                    homescreen.style.opacity = "1";
+
+                    phoneState = "unlocked";
+                    homescreen.style.pointerEvents = "all";
+                    
+                }
             } else {
-                lockscreen.style.transition = "backdrop-filter 0.3s ease-out";
+                lockscreen.style.transition = "backdrop-filter 0.3s ease-out, transform 0.2s ease-out";
                 lockscreenContent.style.transition = "transform 0.2s ease-out";
                 lockscreenBottom.style.transition = "transform 0.2s ease-out";
                 lockscreenUnlockingContent.style.transition = "transform 0.2s ease-out";
 
                 setTranslateY(0);
 
-                lockscreenUnlockingContent.style.transform = `translateY(${window.innerHeight}px)`;
+                if (hasPin) {
+                    lockscreenUnlockingContent.style.transform = `translateY(${window.innerHeight}px)`;
+                } else {
+                    lockscreen.style.transform = `translateY(0px)`;
+                }
 
                 lockscreen.style.backdropFilter = "blur(0px)";
             }
         } 
         else if (phoneState === "unlocking") {
             if (currentY > threshold) {
-                lockscreen.style.transition = "backdrop-filter 0.3s ease-out";
+                lockscreen.style.transition = "backdrop-filter 0.3s ease-out, transform 0.2s ease-out";
                 lockscreenContent.style.transition = "transform 0.2s ease-out";
                 lockscreenBottom.style.transition = "transform 0.2s ease-out";
                 lockscreenUnlockingContent.style.transition = "transform 0.2s ease-out";
@@ -128,19 +170,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 setTranslateY(0);
                 lockscreen.style.backdropFilter = "blur(0px)";
 
-                lockscreenUnlockingContent.style.transform = `translateY(${window.innerHeight}px)`;
+                if (hasPin) {
+                    lockscreenUnlockingContent.style.transform = `translateY(${window.innerHeight}px)`;
+                } else {
+                    lockscreen.style.transform = `translateY(0px)`;
+                }
 
                 phoneState = "locked";
             } else {
-                lockscreen.style.transition = "backdrop-filter 0.3s ease-out";
+                lockscreen.style.transition = "backdrop-filter 0.3s ease-out, transform 0.2s ease-out";
                 lockscreenContent.style.transition = "transform 0.2s ease-out";
                 lockscreenBottom.style.transition = "transform 0.2s ease-out";
                 lockscreenUnlockingContent.style.transition = "transform 0.2s ease-out";
 
                 setTranslateY(-window.innerHeight);
+                
                 lockscreen.style.backdropFilter = `blur(${maxBlur}px)`;
 
-                lockscreenUnlockingContent.style.transform = `translateY(0px)`;
+                if (hasPin) {
+                    lockscreenUnlockingContent.style.transform = `translateY(0px)`;
+                } else {
+                    lockscreen.style.transform = `translateY(-${window.innerHeight}px)`;
+                }
             }
         }
 
@@ -151,18 +202,71 @@ document.addEventListener("DOMContentLoaded", () => {
             lockscreenUnlockingContent.style.transition = "";
         }, 300);
     });
-});
 
-function pinClicked(digit) {
-    if (entered_pin.length < 4) {
-        entered_pin.push(digit);
-        updatePinCells();
+    function unlock() {
+        lockscreen.style.transition = "backdrop-filter 0.3s ease-out, transform 0.2s ease-out, opacity 0.2s ease-out";
 
-        if (entered_pin.length === 4) {
-            console.log("PIN entered:", entered_pin.join(''));
+        lockscreen.style.transform = `translateY(-${window.innerHeight}px)`;
+        lockscreen.style.backdropFilter = `blur(${maxBlur}px)`;
+
+        lockscreen.style.opacity = "0";
+
+        homescreen.style.opacity = "1";
+        homescreen.style.pointerEvents = "all";
+
+        phoneState = "unlocked";
+
+        setTimeout(() => {
+            lockscreen.style.transition = "";
+        }, 300);
+    }
+
+    const pinButtons = [
+        'pin-column-1', 'pin-column-2', 'pin-column-3',
+        'pin-column-4', 'pin-column-5', 'pin-column-6',
+        'pin-column-7', 'pin-column-8', 'pin-column-9',
+        'pin-column-0'
+    ];
+
+    pinButtons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', () => {
+            const digit = id === 'pin-column-0' ? 0 : parseInt(id.split('-').pop());
+            pinClicked(digit);
+            });
+        }
+    });
+
+    const backspaceBtn = document.getElementById('pin-column-backspace');
+        if (backspaceBtn) {
+        backspaceBtn.addEventListener('click', () => {
+            removeLastPinDigit();
+        });
+    }
+
+    
+    async function pinClicked(digit) {
+        if (entered_pin.length < 4) {
+            entered_pin.push(digit);
+            updatePinCells();
+
+            if (entered_pin.length === 4) {
+                const pinStr = entered_pin.join('');
+
+                const isValid = await verifyPin(window.currentUserId, pinStr);
+                if (isValid) {
+                    unlock();
+                } else {
+                    entered_pin = [];
+                    updatePinCells();
+                }
+            }
         }
     }
-}
+
+});
+
 
 function removeLastPinDigit() {
     if (entered_pin.length > 0) {
@@ -182,3 +286,73 @@ function updatePinCells() {
     }
 }
 
+
+async function hashPin(pin) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyPin(userId, enteredPin) {
+  const deviceIdStr = localStorage.getItem("device_id");
+  if (!deviceIdStr) {
+    return false;
+  }
+  const deviceId = Number(deviceIdStr);
+  if (isNaN(deviceId)) {
+    return false;
+  }
+  const userRef = db.collection("users").doc(userId);
+  const docSnap = await userRef.get();
+  if (!docSnap.exists) {
+    return false;
+  }
+
+  const userData = docSnap.data();
+  const devices = userData.devices || [];
+
+  const device = devices.find(d => d.device_id === deviceId);
+  if (!device) {
+    return false;
+  }
+
+  const hashedPin = await hashPin(enteredPin);
+  return hashedPin === device.pin_hash;
+}
+async function waitForUserId(timeout = 5000, interval = 100) {
+  const start = Date.now();
+  while (!window.currentUserId) {
+    if (Date.now() - start > timeout) return null;
+    await new Promise(r => setTimeout(r, interval));
+  }
+  return window.currentUserId;
+}
+
+async function checkPinStatus() {
+  const userId = await waitForUserId();
+  if (!userId) return false;
+
+  const deviceIdStr = localStorage.getItem("device_id");
+  if (!deviceIdStr) return false;
+  const deviceId = Number(deviceIdStr);
+  if (isNaN(deviceId)) return false;
+
+  const userRef = db.collection("users").doc(userId);
+  const docSnap = await userRef.get();
+  if (!docSnap.exists) return false;
+
+  const userData = docSnap.data();
+  const devices = userData.devices || [];
+
+  const device = devices.find(d => d.device_id === deviceId);
+  if (!device) return false;
+
+  const pinHash = device.pin_hash ?? null;
+  if (!pinHash || typeof pinHash !== "string" || !/^[0-9a-f]{64}$/i.test(pinHash)) {
+    return false;
+  }
+
+  return true;
+}
